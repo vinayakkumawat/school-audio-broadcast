@@ -1,15 +1,20 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { AUTH_COOKIE_NAME } from './lib/config/constants';
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('auth-token'); // Replace 'authToken' with your actual token name
-  
+  const token = request.cookies.get(AUTH_COOKIE_NAME);
+
   // Allowlist for unprotected routes
-  const unprotectedRoutes = ['/login', '/test'];
+  const unprotectedRoutes = ['/login', '/api/auth'];
 
   // Check if the current request matches an unprotected route
-  if (unprotectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))) {
-    return NextResponse.next(); // Allow the request to proceed
+  const isUnprotectedRoute = unprotectedRoutes.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  if (isUnprotectedRoute) {
+    return NextResponse.next();
   }
 
   // Redirect to login if the token is missing
@@ -18,10 +23,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next(); // Allow the request to proceed if authenticated
+  return NextResponse.next();
 }
 
-// Apply middleware to all routes
 export const config = {
-  matcher: ['/:path*'], // Match all routes
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

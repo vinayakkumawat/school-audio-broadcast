@@ -1,44 +1,32 @@
 import { NextResponse } from 'next/server';
-import { validateCredentials } from '@/lib/auth';
-import { SignJWT } from 'jose';
-
-const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'MyJWTSecretkeyforthisapp');
+import { authenticateUser } from '@/lib/services/auth.service';
+import { AUTH_COOKIE_NAME, AUTH_COOKIE_MAX_AGE } from '@/lib/config/constants';
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
-    const isValid = await validateCredentials(email, password);
+    const credentials = await request.json();
+    const { token, success } = await authenticateUser(credentials);
 
-    if (!isValid) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' }, 
-        { status: 401 }
-      );
-    }
+    // Create response with success status
+    const response = NextResponse.json({ success });
 
-    const token = await new SignJWT({ email })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('24h')
-      .sign(secret);
-
-    const response = NextResponse.json({ success: true });
-    
+    // Set the auth cookie in the response
     response.cookies.set({
-      name: 'auth-token',
+      name: AUTH_COOKIE_NAME,
       value: token,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 86400, // 24 hours
-      path: '/' // Ensure cookie is set for entire site
+      maxAge: AUTH_COOKIE_MAX_AGE,
+      path: '/',
     });
 
     return response;
   } catch (error) {
     console.error('Authentication error:', error);
     return NextResponse.json(
-      { error: 'Authentication failed: ' + error }, 
-      { status: 500 }
+      { error: 'Authentication failed' },
+      { status: 401 }
     );
   }
 }
