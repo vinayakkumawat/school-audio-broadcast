@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LockKeyhole, AlertCircle } from 'lucide-react';
 
@@ -8,7 +8,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isDbMissing, setIsDbMissing] = useState(false);
+//   const [isDbMissing, setIsDbMissing] = useState(false);
   const router = useRouter();
 
 //   useEffect(() => {
@@ -78,13 +78,13 @@ export default function LoginPage() {
             </div>
           )}
           
-          {isDbMissing && (
+          {/* {isDbMissing && (
             <div className="bg-yellow-50 text-yellow-700 p-3 rounded-md text-sm">
               <p>Default credentials:</p>
               <p>Email: admin@example.com</p>
               <p>Password: admin123</p>
             </div>
-          )}
+          )} */}
           
           <div className="space-y-4">
             <div>
