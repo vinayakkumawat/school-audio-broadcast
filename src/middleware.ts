@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('auth-token'); // Replace 'authToken' with your actual token name
   
   // Allowlist for unprotected routes
-  const unprotectedRoutes = ['/login', '/test', '/api/:path*'];
+  const unprotectedRoutes = ['/login', '/test'];
 
   // Check if the current request matches an unprotected route
   if (unprotectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))) {
